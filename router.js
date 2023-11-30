@@ -38,8 +38,10 @@ Router.put('/saveplace', verifyToken, async (req, res) => {
     try {
       const  userName  = req.userName;
       const exsistList = await AllEvents.findById(eventData)
+      const user = await Allpersons.findOne({username:userName})
       if(exsistList.persons.includes(userName)){res.send('already exist');return}
      if(exsistList.persons.length===exsistList.places){res.send('full');return}
+     if(exsistList.minAge>user.age){res.send('age limited');return}
     const saveplace = await AllEvents.findOneAndUpdate(
     {_id:eventData},
     {$push:{persons:userName}},
