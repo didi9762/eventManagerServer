@@ -8,6 +8,7 @@ const eventSchema = new mongoose.Schema({
   places: { type: Number, required: true },
   persons: { type: Array, default: [] },
   pic: { type: String, required: true },
+  date:{type:Date,require:true}
 });
 
 const AllEvents = mongoose.model('events', eventSchema);

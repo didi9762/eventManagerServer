@@ -27,10 +27,10 @@ UsersRouter.post('/signin',async (req,res)=>{
         if(!userMatch){res.send('user name not correct');return}
         const passMatch = userMatch.password === datauser.password
         if(!passMatch){res.send('incorrect password');return}
-        const token = jwt.sign({ userName: userMatch.username }, 'eventmanager', { expiresIn: '1h' });
+        const token = jwt.sign({ userName: userMatch.username }, 'eventmanager', { expiresIn: datauser.remember?'365d':'1h'});
 
         
-    res.status(200).send(token)
+    res.status(200).json({message:'correct',token:token})
     }catch(e){console.log('error try to log in',e);}
 })
 

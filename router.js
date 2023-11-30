@@ -37,8 +37,9 @@ Router.put('/saveplace', verifyToken, async (req, res) => {
     const eventData = req.body.eventData;
     try {
       const  userName  = req.userName;
-      const isAlreadyIn = await AllEvents.findById(eventData)
-      if(isAlreadyIn.persons.includes(userName)){res.send('already exist');return}
+      const exsistList = await AllEvents.findById(eventData)
+      if(exsistList.persons.includes(userName)){res.send('already exist');return}
+     if(exsistList.persons.length===exsistList.places){res.send('full');return}
     const saveplace = await AllEvents.findOneAndUpdate(
     {_id:eventData},
     {$push:{persons:userName}},
