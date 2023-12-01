@@ -3,7 +3,7 @@ import Allpersons from "./personsSchem.js";
 import jwt from 'jsonwebtoken';
 import verifyToken from "./verifi.js";
 import AllEvents from "./eventsSchem.js";
-
+import Rating from "./ratingSchema.js";
 
 const UsersRouter = express.Router()
 
@@ -48,6 +48,23 @@ UsersRouter.post('/signup',async(req,res)=>{
     }catch(e){console.log('error try add new user',e);}
 })
 
+UsersRouter.post ('/rate/:eventid',verifyToken,async(req,res)=>{
+    const {eventid}= req.params
+    const commant= req.body
+    commant['eventId']=eventid
+    commant['userName']=req.userName
+
+    try{
+        const alreadyRate = await Rating.findOne({userName:req.userName,eventId:eventid})
+        if(alreadyRate){res.send('rated');return}
+    const leaveRate = new Rating(commant)
+    const saveRate =await leaveRate.save()
+
+    }catch(e){console.log('error try save rating',e);}
+
+
+
+})
 
   
 

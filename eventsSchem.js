@@ -9,7 +9,9 @@ const eventSchema = new mongoose.Schema({
   persons: { type: Array, default: [] },
   pic: { type: String, required: true },
   date:{type:Date,require:true},
-  minAge:Number
+  minAge:Number,
+  latitude:String,
+longtude:String
 });
 
 const AllEvents = mongoose.model('events', eventSchema);
