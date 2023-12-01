@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import AllEvents from './eventsSchem.js';
 import Allpersons from './personsSchem.js';
 import verifyToken from './verifi.js';
+import axios from 'axios';
+import Rating from './ratingSchema.js';
 
 const Router = express.Router();
 
@@ -25,13 +27,33 @@ Router.get('/getevent/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const event = await AllEvents.findOne({ _id: id });
-
-    res.send(event);
+    const rating =await  Rating.find({eventId:id})
+    res.json({event:event,rating:rating});
   } catch (e) {
     console.log('Server error getting event by ID:', e);
     res.status(500).send('Internal Server Error');
   }
 });
+
+Router.get('/getmap/:eventid',async (req,res)=>{
+try{
+    const {eventid} = req.params
+
+    console.log(eventid);
+    const currentEvent =await AllEvents.findOne({_id:eventid})
+    if(!currentEvent.latitude||!currentEvent.longtude){res.send('no location');console.log('no:',currentEvent.latitude);return}
+    const apiKey = process.env.API_KEY
+    const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${currentEvent.latitude},${currentEvent.longtude}&zoom=15&size=400x400&key=${apiKey}`;
+
+    const response = await axios.get(mapUrl, { responseType: 'arraybuffer' });
+    res.writeHead(200, { 'Content-Type': 'image/png' });
+    res.end(Buffer.from(response.data, 'binary'));
+  } catch (error) {
+    console.error('Error fetching map:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 Router.put('/saveplace', verifyToken, async (req, res) => {
     const eventData = req.body.eventData;
