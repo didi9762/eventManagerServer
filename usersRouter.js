@@ -3,16 +3,16 @@ import Allpersons from "./personsSchem.js";
 import jwt from 'jsonwebtoken';
 import verifyToken from "./verifi.js";
 import AllEvents from "./eventsSchem.js";
-import Rating from "./ratingSchema.js";
 
 const UsersRouter = express.Router()
 
 UsersRouter.get('/getevents',verifyToken, async (req, res) => {
     try {
 const userName = req.userName
-        
+        const user = await Allpersons.findOne({username:userName})
+
       const events = await AllEvents.find()
-res.send(events.filter((event)=>event.persons.includes(userName)))
+res.json({events:events.filter((event)=>event.persons.includes(userName)),user:user})
     } catch (e) {
       console.error('Error trying to get events', e);
       res.status(500).send('Internal Server Error');
@@ -48,21 +48,23 @@ UsersRouter.post('/signup',async(req,res)=>{
     }catch(e){console.log('error try add new user',e);}
 })
 
-UsersRouter.post ('/rate/:eventid',verifyToken,async(req,res)=>{
+UsersRouter.put ('/rate/:eventid',verifyToken,async(req,res)=>{
     const {eventid}= req.params
-    const commant= req.body
-    commant['eventId']=eventid
-    commant['userName']=req.userName
+    const comment= req.body
+    comment['eventId']=eventid
+    comment['userName']=req.userName
 
     try{
-        const alreadyRate = await Rating.findOne({userName:req.userName,eventId:eventid})
-        if(alreadyRate){res.send('rated');return}
-    const leaveRate = new Rating(commant)
-    const saveRate =await leaveRate.save()
+        const rateList = await AllEvents.findById(eventid)
+        const hasRated = rateList.rating.some((rate) => rate.userName === req.userName);
+    if (hasRated) {
+      return res.send('rated');
+    }
+      rateList.rating.push(comment);
+        await rateList.save();
+    
 
     }catch(e){console.log('error try save rating',e);}
-
-
 
 })
 
