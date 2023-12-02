@@ -4,7 +4,7 @@ import AllEvents from './eventsSchem.js';
 import Allpersons from './personsSchem.js';
 import verifyToken from './verifi.js';
 import axios from 'axios';
-import Rating from './ratingSchema.js';
+
 
 const Router = express.Router();
 
@@ -27,8 +27,7 @@ Router.get('/getevent/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const event = await AllEvents.findOne({ _id: id });
-    const rating =await  Rating.find({eventId:id})
-    res.json({event:event,rating:rating});
+    res.send(event);
   } catch (e) {
     console.log('Server error getting event by ID:', e);
     res.status(500).send('Internal Server Error');
